@@ -52,10 +52,10 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
     this.set = (i, j, val) => arr[r(i)][c(j)] = val;
     this.sum = () => arr.reduce( (a, n) => a + arr_sum(n), 0);
     this.map = function (f) {
-    return new TDArray(rows, 
-                       cols, 
-                       (i, j) => f(this.at(i,j), i, j, this), 
-                       wrap);
+        return new TDArray(rows, 
+                         cols, 
+                           (i, j) => f(this.at(i,j), i, j, this), 
+                           wrap);
     };
     this.for_each = (f) => {
 	    for (i = 0; i < this.rows; i++) {
@@ -64,24 +64,40 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
 		    }
 	    }
     }	
+    this.rect = (i0, j0, i1, j1) => {
+	//returns the submatrix of entries (i, j) such that 
+	//i0 <= i <= i1 and j0 <= j <= j1
+	    let row_indices = range(i0, i1 + 1);
+	    let col_indices = range(j0, j1 + 1);
+
+        let rect_arr = row_indices.map( (i) => 
+                        col_indices.map ( (j) => 
+                          this.at(i,j) ) );
+
+         return new TDArray(i1 - i0 + 1, j1 - j0 + 1,
+                          (i, j) => rect_arr[i][j],
+                          wrap);
+    }
+
     this.row = (i) => arr[r(i)];
     this.col = (j) => arr.map( (a) => a[c(j)] );
     this.nbhood = function (i, j, row_d, col_d=row_d) {
-        if (! wrap) {
-             console.log("Warning: nbhood called on TDArray with wrap = false.");
-        }
-    
-        let row_indices = range(i - row_d, i + 1 + row_d).map(r);
-        let col_indices = range(j - col_d, j + 1 + col_d).map(c);
-   
-   // select the right rows
-        let arrs = row_indices.map( (i) => 
-                    col_indices.map ( (j) => 
-                      this.at(i,j) ) );
-    
-        return new TDArray(2 * row_d + 1, 2 * col_d + 1,
-                          (i, j) => arrs[i][j],
-                          wrap);
-    };
+        const i_min = i - row_d;
+        const i_max = i + row_d;
+        const j_min = j - col_d;
+        const j_max = j + col_d;
+        return this.rect(i_min, j_min, i_max, j_max);
+    }
+
+    this.merge = (tdarr, i=0, j=0) => {	
+	//copy in elements of tdarr such that tdarr[0][0] is 
+	//at this TDArray's [i][j] position.
+	    const row_indices = range(i, i + tdarr.rows);
+	    const col_indices = range(j, j + tdarr.cols);
+        row_indices.forEach( (x, i) =>
+            col_indices.forEach( (y, j) =>
+                this.set(x, y, tdarr.at(i, j))));
+    }
 }
+
 
