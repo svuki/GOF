@@ -1,4 +1,7 @@
-
+// This file defines Gof and Decorate_gof. A Gof (game of life) is a two 
+// dimensional array, a rule, which defines the next generation of the array.
+// A decorated_gof is is a gof associated with a canvas. Interactions through
+// a decoared_gof update what is displayed on the canvas.
 
 
 function apply_rule(rule_fn, tdarray){
@@ -23,6 +26,12 @@ function Gof(cols, rows, rule=classic_rule) {
 		this.cells = this.cells.map( () => 0 );
 		this.generate = 0;
 	};	
+    this.copy = function() {
+        let ret = new Gof(cols, rows, this.rule);
+        ret.generation = this.generation; 
+        ret.cells = this.cells.copy();
+        return ret;
+    }
 } 
 
 function classic_rule(val, i, j, td){
@@ -55,17 +64,16 @@ function canvas_to_gof(canvas, cell_size=10) {
 
 function Decorated_gof(canvas, cell_size=10) {
     
-    const saved = {};
     const ctx = canvas.getContext('2d');
     const from_canvas = (x) => Math.floor(x / cell_size);
     const to_canvas  = (i) => i * cell_size;
-    const gof = canvas_to_gof(canvas, cell_size);
+    let gof = canvas_to_gof(canvas, cell_size);
     const draw_cell = (val, i, j) => {
         let color = colors[val];
         ctx.fillStyle = color;
         ctx.fillRect(to_canvas(i), to_canvas(j), cell_size, cell_size);
     }
-        
+    this.show_gof = () => gof.cells.show();    
     
     this.toggle = (i,j) => {
         let val = gof.toggle(i,j);
@@ -82,7 +90,7 @@ function Decorated_gof(canvas, cell_size=10) {
 	    gof.clear();
 	    this.show();
     }
-    this.save = () => saved[this.generation] = gof;
+
     this.saved_pattern = undefined;
     this.handle = (e_down_coords, e_up_coords) => {
         const i0 = from_canvas(e_down_coords[0]);
@@ -105,6 +113,14 @@ function Decorated_gof(canvas, cell_size=10) {
             this.show();
         }
     }
+    this.save_gof = function() {
+        return gof.copy();
+    }
+    this.load_gof = function(new_gof) {
+        gof = new_gof;
+        this.show();
+    }
+    this.generation = () => gof.generation;        
 }
     
 
