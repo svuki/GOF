@@ -1,4 +1,4 @@
-function SpeedController(n=1000, f=undefined) {
+function RateController(n=1000, f=undefined) {
   // Executes the function f every n msecs. The rate can be changed (set_rate), the execution can
   // be turned on and off (toggle, on, off), and a new function can be set. If a new function is set
   // when the old function was executing, the new function will begin executing instead, and the old
@@ -24,4 +24,3 @@ function SpeedController(n=1000, f=undefined) {
   this.is_on = () => this.handle !== undefined;
 }
 
-var x = new SpeedController(1000, () => console.log('hi') )
