@@ -1,3 +1,7 @@
+// This files contains functions related to the construction and manipulation
+// of two dimensional arrays (TDArray)
+
+
 function mapmap (arr, f) {
     //applies f to each element of f, producing
     //a new 2D array. The arguments passed to f are
@@ -53,7 +57,7 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
     this.sum = () => arr.reduce( (a, n) => a + arr_sum(n), 0);
     this.map = function (f) {
         return new TDArray(rows, 
-                         cols, 
+                           cols, 
                            (i, j) => f(this.at(i,j), i, j, this), 
                            wrap);
     };
@@ -65,18 +69,27 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
 	    }
     }	
     this.rect = (i0, j0, i1, j1) => {
-	//returns the submatrix of entries (i, j) such that 
-	//i0 <= i <= i1 and j0 <= j <= j1
-	    let row_indices = range(i0, i1 + 1);
-	    let col_indices = range(j0, j1 + 1);
+        //normalize input order so that i0 <= i1 and j0 <= j1
+        if (i1 < i0) {
+            return this.rect(i1, j0, i0, j1);
+        }
+        else if (j1 < j0) {
+            return this.rect(i0, j1, i1, j0);
+        }
+	    //returns the submatrix of entries (i, j) such that 
+	    //i0 <= i <= i1 and j0 <= j <= j1
+	    else {
+            let row_indices = range(i0, i1 + 1);
+    	    let col_indices = range(j0, j1 + 1);
 
-        let rect_arr = row_indices.map( (i) => 
-                        col_indices.map ( (j) => 
-                          this.at(i,j) ) );
+            let rect_arr = row_indices.map( (i) => 
+                            col_indices.map ( (j) => 
+                              this.at(i,j) ) );
 
-         return new TDArray(i1 - i0 + 1, j1 - j0 + 1,
-                          (i, j) => rect_arr[i][j],
+             return new TDArray(i1 - i0 + 1, j1 - j0 + 1,
+                                  (i, j) => rect_arr[i][j],
                           wrap);
+        }
     }
 
     this.row = (i) => arr[r(i)];
@@ -98,6 +111,7 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
             col_indices.forEach( (y, j) =>
                 this.set(x, y, tdarr.at(i, j))));
     }
+    this.copy = () => this.map ( (x) => x);
 }
 
 
