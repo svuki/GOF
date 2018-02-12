@@ -1,23 +1,30 @@
-canvas {
+.wrapper {
+    margin: auto;
+    position: relative;
+    width: 900px;
+}
+
+.wrapper canvas {   
     border: 1px solid #000000;
     position: absolute;
     top: 0;
     left: 0;
 }
 
-.wrapper {
-    margin: auto;
+.controls {
     position: relative;
-    width: 900px;
+    top: 500px;
+}
+
+.info {
+    position: relative;
+}
+
+.saves {
+    position: relative;
+    top: 520px;
     height: 500px;
 }
-
-.wrapper canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
 #grid-canvas {
     z-index: 2;
 }
