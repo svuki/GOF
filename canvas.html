@@ -1,8 +1,17 @@
-<canvas id="gof-canvas" width="900" height="500" style="border:1px solid #000000"></canvas>
-<button onclick="toggle_go()">Go/Stop</button>
-<button onclick="reset()">Reset</button>
+<head>
+<link rel="stylesheet" type="text/css" href="gof.css">
+</head><div class="wrapper">
+<canvas id="grid-canvas" width="900" height="500"></canvas>
+<canvas id="gof-canvas" width="900" height="500"></canvas>
+<canvas id="io-canvas" width="900" height="500"></canvas>
+</div>
+<button onclick="control.button0()">Go/Stop</button>
+<button onclick="control.button1()">Reset</button>
+<button onclick="control.button2()">Grid</button>
 <input id="rate-slider" type="range" min="1" max="1000" value="1000">
-<script src="speed_controller.js"></script>
+<script src="rate_controller.js"></script>
 <script src="TDArray.js"></script>
 <script src="gof.js"></script>
+<script src="grid.js"></script>
+<script src="controller.js"></script>
 
