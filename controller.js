@@ -1,6 +1,6 @@
 const gof_canvas = document.getElementById('gof-canvas');
 const grid_canvas = document.getElementById('grid-canvas');
-const rate_slider = document.getElementById("rate-slider");
+const rate_slider = document.getElementById('rate-slider');
 
 const control = {
     grid_canvas : grid_canvas,
@@ -9,9 +9,11 @@ const control = {
     current_gof : new Decorated_gof(gof_canvas),
     r_control : new RateController(1000, 
                                    function() {control.current_gof.next();}),
+    saves   : [],
     button0 : () => toggle_gof_on(),
     button1 : () => reset_gof(),
     button2 : () => toggle_grid(),
+    button3 : () => save(),
 };
 
 
@@ -36,7 +38,9 @@ function toggler(decorate_gof){
                 down_event = [e.offsetX, e.offsetY];
             }
         }
-        else if (e.type === "mouseup" && down_event !== undefined) {
+        else if (e.type === "mouseup" 
+                 && down_event !== undefined
+                 && e.shiftKey === false) {
             decorate_gof.handle(down_event, [e.offsetX, e.offsetY]);
         }
     }
@@ -48,5 +52,26 @@ grid_canvas.addEventListener('mousedown',
             (e) => mouse_click_handler(e));
 grid_canvas.addEventListener('mouseup', 
             (e) => mouse_click_handler(e));
+
+
+//Saving and resotoring
+const save_list = document.getElementById('save-list');
+let save_counter = 0;
+
+function restore(n) {
+    let gof = control.saves[n];
+    control.current_gof.load_gof(gof);
+}
+
+
+function save() {
+	control.saves.push(control.current_gof.save_gof());
+	save_list.insertAdjacentHTML('beforeend', 
+              "<li id=save" + save_counter + "> New Save </li>")
+	const elem = document.getElementById("save" + save_counter);
+    let val = save_counter;
+	elem.addEventListener('click', () => restore(val));
+	save_counter++;
+}
 
 
