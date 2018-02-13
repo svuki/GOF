@@ -117,7 +117,7 @@ function Decorated_gof(canvas, cell_size=10) {
         return gof.copy();
     }
     this.load_gof = function(new_gof) {
-        gof = new_gof;
+        gof = new_gof.copy();
         this.show();
     }
     this.generation = () => gof.generation;        
