@@ -65,13 +65,55 @@ function restore(n) {
 
 
 function save() {
-	control.saves.push(control.current_gof.save_gof());
-	save_list.insertAdjacentHTML('beforeend', 
-              "<li id=save" + save_counter + "> New Save </li>")
-	const elem = document.getElementById("save" + save_counter);
+    const gof = control.current_gof.save_gof();
+	control.saves.push(gof);
+    const thumbnail = gof_thumbnail(gof);
+	save_list.appendChild(thumbnail);
     let val = save_counter;
-	elem.addEventListener('click', () => restore(val));
+	thumbnail.addEventListener('click', () => {console.log('clicked');restore(val)});
 	save_counter++;
 }
+
+function flat_map(arr, fn) {
+    let x = arr.map( fn );
+    return x.reduce ( (a, n) => a.concat(n), []);
+}
+
+function val_to_RGBA(val) {
+    return val === 1 ? [0,0,0,255] : [255, 255, 255, 255];
+}
+
+function tdarr_to_rgba(tdarr) {
+    return flat_map(tdarr.as_array(), val_to_RGBA );
+}
+
+function tdarr_to_image_data(tdarr, image_data) {
+    let c      = tdarr_to_rgba(tdarr);
+    c.forEach( (v, i) => image_data.data[i] = v );
+ 
+}
+    
+function gof_thumbnail(gof) {
+    //produce a thumbnail versiion of the TDArray on the canvas
+    const tdarr = gof.cells;
+    const canvas = document.createElement('canvas');
+    canvas.height = tdarr.cols;
+    canvas.width  = tdarr.rows;
+    canvas.class  = "saved-gof";
+    console.log("ok, canvas created")
+    const ctx = canvas.getContext('2d');
+    let img_data = ctx.createImageData(tdarr.cols, tdarr.rows);
+    tdarr_to_image_data(tdarr, img_data);
+    
+    ctx.putImageData(img_data, 0, 0);
+    console.log("ok, placed image data");
+    
+    return canvas;
+}
+    
+
+    
+
+
 
 
