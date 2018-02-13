@@ -111,7 +111,8 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
             col_indices.forEach( (y, j) =>
                 this.set(x, y, tdarr.at(i, j))));
     }
-    this.copy = () => this.map ( (x) => x);
+    this.copy = () => this.map ( (x) => x);	
+    this.as_array = () => arr.reduce( (acc, orig) => acc.concat(orig), [] );
 }
 
 
