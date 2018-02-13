@@ -22,7 +22,8 @@
           <li> The Go/Stop button will toggle iteration.</li>
           <li> The slide controls the rate of iteration.</li>
           <li> The reset button will clear the board of any live cells.</li>
-          <li> The grid button wil overlay a grid over the board.</li>
+          <li> The grid button will overlay a grid over the board.</li>
+          <li> The save button will add the current state to the save-list. Clicking an element of the save-list will restore that state to the main canvas</li>
         </ul>
         </div>
         <div class="wrapper">
@@ -35,7 +36,7 @@
             <input class="controls" id="rate-slider" type="range" min="1" max="1000" value="1000">
             <div class="saves">
                <ol id="save-list">
-             </ol>
+               </ol>
             </div>
         </div>
        
@@ -44,6 +45,7 @@
         <script src="TDArray.js"></script>
         <script src="gof.js"></script>
         <script src="grid.js"></script>
+	<script stc="workspace.js"></script>
         <script src="controller.js"></script>
     </body>
 </html>
