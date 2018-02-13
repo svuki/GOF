@@ -97,8 +97,8 @@ function gof_thumbnail(gof) {
     //produce a thumbnail versiion of the TDArray on the canvas
     const tdarr = gof.cells;
     const canvas = document.createElement('canvas');
-    canvas.height = tdarr.cols;
-    canvas.width  = tdarr.rows;
+    canvas.width = tdarr.cols;
+    canvas.height  = tdarr.rows;
     canvas.class  = "saved-gof";
     console.log("ok, canvas created")
     const ctx = canvas.getContext('2d');
