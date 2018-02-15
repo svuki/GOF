@@ -2,31 +2,6 @@
 // of two dimensional arrays (TDArray)
 
 
-function mapmap (arr, f) {
-    //applies f to each element of f, producing
-    //a new 2D array. The arguments passed to f are
-    // (val, row_index, col_index, arr)
-    return arr.map( (arr, r) =>
-		    (arr.map( (val, c) =>
-			      f(val, r, c, arr))));
-}
-
-function arr_sum (arr) {
-    ///returns the sume of the elements of arr
-    return arr.reduce( (a, n) => a + n);
-}
-
-function range (x, y) {
-    //if only passed one value, returns the [0, 1, ..., x - 1]
-    //if passed two values returns [x, x + 1, ..., y]
-    if (y) {
-        return Array.from({length : y - x}, (v, i) => i + x);
-    }
-    else {
-        return Array.from({length : x}, (v, i) => i);
-    }
-}
-
 function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) { 
     // Constructor for two dimensional arrays. 
     // init_fn is a function that is passed (row_index, col_index)
@@ -110,9 +85,29 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap=true) {
         row_indices.forEach( (x, i) =>
             col_indices.forEach( (y, j) =>
                 this.set(x, y, tdarr.at(i, j))));
-    }
+    };
     this.copy = () => this.map ( (x) => x);	
     this.as_array = () => arr.reduce( (acc, orig) => acc.concat(orig), [] );
+    this.row_map = (f) => arr.map( f );
+    this.transpose = () => new TDArray(this.cols, this.rows, (i, j) => this.at(j, i));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
