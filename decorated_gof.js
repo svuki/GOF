@@ -25,11 +25,11 @@ function Decorated_gof(canvas, cell_size=10) {
         ctx.fillRect(to_canvas(j), to_canvas(i), cell_size, cell_size);
     }
     this.show_gof = () => gof.cells.show();    
-   
+    this.gof = () => gof;
     this.toggle = (i,j) => {
         const val = gof.toggle(i,j);
         draw_cell(val, i, j);
-    }
+    } 
 
      this.canvas_toggle = (x, y) => {
         const i = from_canvas(y);
@@ -78,5 +78,9 @@ function Decorated_gof(canvas, cell_size=10) {
         this.show();
     }
     this.generation = () => gof.generation;        
+    this.soup = function() {
+       gof.soup();
+       this.show();
+    }
 }
     
