@@ -14,6 +14,9 @@ const control = {
     button1 : () => reset_gof(),
     button2 : () => toggle_grid(),
     button3 : () => save(),
+    button4 : function() {
+	this.current_gof.soup();
+    },
 };
 
 
@@ -31,7 +34,6 @@ function toggler(decorate_gof){
     return function(e) {
         if (e.type === "mousedown") {
             if (e.shiftKey) {
-                console.log("merging!")
                 control.current_gof.handle_merge(e.offsetX, e.offsetY);
             }
             else {
@@ -111,9 +113,18 @@ function gof_thumbnail(gof) {
     return canvas;
 }
     
+//Handling RLE encoding/decoding
+const rle_text = document.getElementById("rle-textarea")
+function get_pattern() {
+	const rle_str = rle_text.value;
+	const pattern = rle.decode(rle_str);
+	control.current_gof.saved_pattern = pattern.pattern;
+}
 
-    
-
-
+function generate_rle() {
+	const tdarr = control.current_gof.gof().cells;
+	const rule = control.current_gof.gof().rule;
+	rle_text.value = rle.encode(tdarr, rule);
+}
 
 
