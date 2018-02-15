@@ -33,19 +33,31 @@
             <button onclick="control.button1()" class="controls">Reset</button>
             <button onclick="control.button2()" class="controls">Grid</button>
             <button onclick="control.button3()" class="controls">Save</button>
+            <button onclick="control.button4()" class="controls">Soup</button>
             <input class="controls" id="rate-slider" type="range" min="1" max="1000" value="1000">
             <div class="saves">
                <ol id="save-list">
                </ol>
             </div>
+			<div class="patterns">
+					<textarea id="rle-textarea" rows="6" cols="70">Enter RLE here.</textarea>
+				<div class="buttons">
+					<button class="rle-button" id="rle_submit_btn" onclick="get_pattern()">Read RLE</button>
+					<button class="rle-button" id="rle_generate_btn" onclick="generate_rle()">Generate RLE</button>
+				</div>
+				
+			</div>
         </div>
        
 
+	<script src="utils.js"></script>
         <script src="rate_controller.js"></script>
         <script src="TDArray.js"></script>
         <script src="gof.js"></script>
         <script src="grid.js"></script>
 	<script src="decorated_gof.js"></script>
         <script src="controller.js"></script>
+	<script src="rle.js"></script>
+	<script src="patterns.js"></script>
     </body>
 </html>
