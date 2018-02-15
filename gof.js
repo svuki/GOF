@@ -4,17 +4,13 @@
 // a decoared_gof update what is displayed on the canvas.
 
 
-function apply_rule(rule_fn, tdarray){
-  return tdarray.map ( rule_fn );
-}
-
-function Gof(cols, rows, rule=classic_rule) {
+function Gof(rows, cols, rule=classic_rule, cells=(new TDArray(rows, cols))) {
 	this.generation = 0;
 	this.rule = rule;
-	this.cells = new TDArray(cols, rows);
+	this.cells = cells;
 	this.next  = function () { 
-		this.cells = apply_rule(this.rule, this.cells); 
-		this.generation++
+	    this.cells = this.cells.map(rule.as_fn);
+	    this.generation++;
 	};
 	//TODO: what to do for toggle of more than one possible val?
 	this.toggle = (i, j) => {
@@ -32,19 +28,30 @@ function Gof(cols, rows, rule=classic_rule) {
         ret.cells = this.cells.copy();
         return ret;
     }
+    this.soup = function() {
+        this.cells = this.cells.map( () => Math.random() > 0.5? 1 : 0 );
+    }                
 } 
 
-function classic_rule(val, i, j, td){
-	let s = td.nbhood(i,j,1,1).sum();
-        //because the value at (i,j) is included in the sum
-        //we check for s == 3 or 4 instead of s == 2 or 3
-        if (val === 1 && (s === 3 || s === 4)) {
-         	return 1;
-        }
-        else if (val === 0 && s === 3){
-                return 1;
-        }
-        return 0;
-} 
+function Rule(s) {
+    const matches = s.match("[B,b](.*)/[S,s](.*$)")
+    this.b = matches[1].split("").map( (v) => parseInt(v, 10) );
+    this.s = matches[2].split("").map( (v) => parseInt(v, 10) );
+    this.string = s
+    this.as_fn  = (val, i, j, tdarr) => {
+	let sum = tdarr.nbhood(i,j,1,1).sum() - val;
+	if (val === 0 && this.b.includes(sum))
+	    return 1;
+	else if (val === 1 && this.s.includes(sum))
+	    return 1;
+	else
+	    return 0;
+    }
+}
+
+const classic_rule = new Rule("B3/S23");
+
+
+
 
 
