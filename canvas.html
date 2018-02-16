@@ -3,7 +3,7 @@
 	<head>
      <meta charset="UTF-8">
      <title>The Game of Life</title>
-     <link rel="stylesheet" type="text/css" href="gof.css">
+     <link rel="stylesheet" type="text/css" href="css/gof.css">
   </head>
   <body>
     <div class="info">
@@ -28,13 +28,16 @@
         </div>
         <div class="wrapper">
             <canvas id="grid-canvas" width="900" height="500"></canvas>
-            <canvas id="gof-canvas" width="900" height="500"></canvas>
-            <button onclick="control.button0()" class="controls">Go/Stop</button>
-            <button onclick="control.button1()" class="controls">Reset</button>
-            <button onclick="control.button2()" class="controls">Grid</button>
-            <button onclick="control.button3()" class="controls">Save</button>
-            <button onclick="control.button4()" class="controls">Soup</button>
-            <input class="controls" id="rate-slider" type="range" min="1" max="1000" value="1000">
+            <canvas id="gol-canvas" width="900" height="500"></canvas>
+            <button id="toggle_step_btn" class="controls">Go/Stop</button>
+            <button id="reset_btn"  class="controls">Reset</button>
+            <button id="toggle_grid_btn" class="controls">Grid</button>
+            <button class="controls">Save</button>
+            <button id="soup_btn" class="controls">Soup</button>
+            <label for="rate_slider" class="controls">Rate:</label>
+	    <input class="controls" id="rate_slider" step="-1" type="range" max="1000" min="50" value="1000">
+	    <label for="zoom_slider" class="controls">Zoom:</label>
+	    <input class="controls" id="zoom-slider" step="-1" type="range" max="20" min="5" value="10">
             <div class="saves">
                <ol id="save-list">
                </ol>
@@ -49,15 +52,16 @@
 			</div>
         </div>
        
-
-	<script src="utils.js"></script>
-        <script src="rate_controller.js"></script>
-        <script src="TDArray.js"></script>
-        <script src="gof.js"></script>
-        <script src="grid.js"></script>
-	<script src="decorated_gof.js"></script>
-        <script src="controller.js"></script>
-	<script src="rle.js"></script>
-	<script src="patterns.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="js/utils.js"></script>
+        <script src="js/rate_controller.js"></script>
+        <script src="js/TDArray.js"></script>
+        <script src="js/gof.js"></script>
+	<script src="js/projection.js"></script>
+        <script src="js/presenter.js"></script>
+	<script src="js/grid.js"></script>
+        <script src="js/control.js"></script>
+	<script src="js/rle.js"></script>
+	<script src="js/patterns.js"></script>
     </body>
 </html>
