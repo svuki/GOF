@@ -38,22 +38,21 @@
 #gof-canvas {
     z-index: 1;
 }
-.patterns {
-    position: relative;
-}
-.buttons {
-    display: inline;
-    position: absolute;
-}
-.rle-button { 
-    position: relative;
-    display: block;
-    size: auto;
-}
-#rle_submit_butn {
-	z-index: 3;
+
+.rle_area {
+    height: 200px;
+    width: 540px;
 }
 
-#rle-textarea {
-	z-index:3;
+#rle_textarea {
+    width: 540px;
+}
+.rle_area button{ 
+    position: relative;
+    width: 265px;
+}
+
+#pattern_canvas {
+    top: 550px;
+    left: 600px;
 }
