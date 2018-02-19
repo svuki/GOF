@@ -39,29 +39,29 @@
 	    <label for="zoom_slider" class="controls">Zoom:</label>
 	    <input class="controls" id="zoom-slider" step="-1" type="range" max="20" min="5" value="10">
             <div class="saves">
-               <ol id="save-list">
-               </ol>
+              <ol id="save-list">
+              </ol>
             </div>
-			<div class="patterns">
-					<textarea id="rle-textarea" rows="6" cols="70">Enter RLE here.</textarea>
-				<div class="buttons">
-					<button class="rle-button" id="rle_submit_btn" onclick="get_pattern()">Read RLE</button>
-					<button class="rle-button" id="rle_generate_btn" onclick="generate_rle()">Generate RLE</button>
-				</div>
-				
-			</div>
-        </div>
-       
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	    <div class="rle_area">
+	      <textarea id="rle_textarea" rows="6" cols="70">Enter RLE here.</textarea>
+	      <button id="rle_submit_btn" onclick="stuff()">Read RLE</button>
+	      <button id="rle_generate_btn">Generate RLE</button>
+	    </div>
+	    <div class="saved_pattern">
+	      <canvas id="pattern_canvas" width="300" height="300"></canvas>
+	    </div>
+	</div>
+	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="js/utils.js"></script>
         <script src="js/rate_controller.js"></script>
         <script src="js/TDArray.js"></script>
         <script src="js/gof.js"></script>
 	<script src="js/projection.js"></script>
-        <script src="js/presenter.js"></script>
-	<script src="js/grid.js"></script>
-        <script src="js/control.js"></script>
-	<script src="js/rle.js"></script>
+        <script src="js/grid.js"></script>
+	<script src="js/main_canvas.js"></script>
+        <script src="js/state.js"></script>
+	<script src="js/control.js"></script>
 	<script src="js/patterns.js"></script>
     </body>
 </html>
