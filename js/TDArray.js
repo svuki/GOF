@@ -2,7 +2,7 @@
 // of two dimensional arrays (TDArray)
 
 
-function TDArray (rows, cols=rows, init_fn=undefined, wrap_b=true) { 
+function TDArray (rows, cols=rows, init_fn=undefined, wrap_b=false) { 
     // Constructor for two dimensional arrays. 
     // init_fn is a function that is passed (row_index, col_index)
     // If no init_fn is specified, all elements are initialized to 0.
@@ -28,7 +28,16 @@ function TDArray (rows, cols=rows, init_fn=undefined, wrap_b=true) {
     this.rows = rows;
     this.cols = cols;	
     this.show = () => console.log(arr);
-    this.at  = (i, j) => arr[r(i)][c(j)];
+    this.at  = function(i, j) {
+	if (wrap_b)
+	    return arr[r(i)][c(j)];
+	//otherwise check bounds, returning zero if out of bounds
+	else if (i < 0 || i >= this.rows || j < 0 || j >= this.cols)
+	    return 0;
+	else
+	    return arr[i][j];
+    }
+	    
     this.set = (i, j, val) => arr[r(i)][c(j)] = val;
     this.sum = () => arr.reduce( (a, n) => a + arr_sum(n), 0);
     this.row = (i) => arr[r(i)];
