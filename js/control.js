@@ -9,3 +9,11 @@ $("#rate_slider").on( 'input',
 			  set_rate(this.value)});
 
 
+const rle_textarea = $("#rle_textarea");
+
+$("#rle_submit_btn").click( function() {
+    const rle_text = rle_textarea.val();
+    const result = rle.decode(rle_text);
+    set_pattern(result.gamestate);
+});
+    
