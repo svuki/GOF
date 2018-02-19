@@ -7,29 +7,30 @@ function draw_line(ctx, x0, y0, x1, y1) {
 
 function draw_horizontal_lines(canvas, offset, spacing) {
     const ctx = canvas.getContext('2d');
-    range(Math.ceil(canvas.width / spacing))
+    range(Math.ceil(canvas.height / spacing))
           .forEach((v) => 
               draw_line(ctx, 
-                        offset + (v * spacing), 0, 
-                        offset + (v * spacing), canvas.height));
+                        0, offset + (v * spacing),
+                        canvas.width, offset + (v * spacing)));
 }
 
 function draw_vertical_lines(canvas, offset, spacing) { 
 	const ctx = canvas.getContext('2d');
-	    range(Math.ceil(canvas.height / spacing))
+	    range(Math.ceil(canvas.width / spacing))
 	          .forEach((v) => 
 	              draw_line(ctx, 
-	                        0, offset + (v * spacing), 
-	                        canvas.width, offset + (v * spacing)));
+	                        offset + (v * spacing), 0,
+	                        offset + (v * spacing), canvas.height));
 }    
 
 
 function Grid (canvas, csize=10) {
     const ctx = canvas.getContext('2d');
+    ctx.lineWidth = 0.5;
+    
     let on_b = false;
     this.cell_size = csize;
     this.project_grid = function() {
-        console.log("grid cell_size is: " + this.cell_size);
 	const canv_rows = canvas.height / this.cell_size;
 	const canv_cols = canvas.width / this.cell_size;
 	
@@ -38,10 +39,12 @@ function Grid (canvas, csize=10) {
 	ctx.lineWidth = 0.5;
 	draw_horizontal_lines(canvas, y_offset, this.cell_size);
         draw_vertical_lines(canvas, x_offset, this.cell_size);
+	on_b = true;
     }
     
     this.clear_grid = function() {
 	ctx.clearRect(0,0, canvas.width, canvas.height);
+	on_b = false;
     }
     
     this.toggle = () => {
