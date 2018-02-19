@@ -40,7 +40,9 @@ GameState.prototype.soup = function () {
 GameState.prototype.merge = function(otherGameState, i=0, j=0) {
     //takes the cells of otherGameState and copies them in such that
     //cells[0][0] of otherGameState is at [i][j] in this game state
-    this.cells.merge(otherGameState.cells, i, j);
+    let new_cells = this.cells.copy();
+    new_cells.merge(otherGameState.cells, i, j);
+    return new GameState(new_cells);
 }
 GameState.prototype.map = function (f) {
     return new GameState(this.cells.map(f));
