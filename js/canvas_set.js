@@ -26,18 +26,35 @@ function Canvas_set(canvas_id, cell_size=10) {
 	this.get_gamestate = getter;
 	this.coordinate_handler = new Coordinate_handler(this.under_canvas,
 							 gamestate, cell_size);
-	this.coordinate_handler.initialize();
 	this.projector.initialize(gamestate, this.coordinate_handler);
-	console.log("initialized");
+	
     }
 
-    this.toggle = function(x,y) {
-	console.log("Received click instruction.");
-	let i = this.coordinate_handler.y_i(y);
-	let j = this.coordinate_hyandler.x_j(x);
-	
-	this.set_gamestate(this.get_gamestate.toggle(i, j));
+    this.change_gamestate = function(gamestate, cell_size){
+	// used when one wants to display a gamestate of different dimensions than the previous one
+	this.coordinate_handler = new Coordinate_handler(this.under_canvas,
+							 gamestate, cell_size);
+	this.projector.resize(this.coordinate_handler, gamestate);
     }
+    
+    this.toggle = function(x,y) {
+	let i = this.coordinate_handler.y_i(y);
+	let j = this.coordinate_handler.x_j(x);
+	let a = this.get_gamestate().toggle(i,j);
+	console.log(a);
+	this.set_gamestate(a);
+    }
+
+    //By default, clicking toggles the underlying cell
+    $(this.over_canvas).click( (e) => this.toggle(e.offsetX, e.offsetY));
+
+    this.merge = function(otherGameState, x, y) {
+	let i = this.coordinate_handler.y_i(y);
+	let j = this.coordinate_handler.x_j(x);
+
+	this.set_gamestate(this.get_gamestate().merge(otherGameState, i, j));
+    }
+
     this.project = function() {
 	this.projector.project(this.get_gamestate());
     }
