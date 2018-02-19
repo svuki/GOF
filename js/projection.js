@@ -62,9 +62,7 @@ function Coordinate_handler(canvas, gstate, csize) {
 	this.x_j = x_to_j(r.j_0, r.x_offset, this.cell_size);
     }
 
-    this.initialize = function() {
-	this.resize(csize);
-    }
+    this.resize(csize);
 }
 
 //Drawing
@@ -112,10 +110,6 @@ function Projector(canvas){
     this.project = function(gamestate) {
 	
 	const r = rectangle;
-
-	console.log("PROJECT: x_offset: " + r.x_offset);
-	console.log("PROJECT: y_offset: " + r.y_offset);
-
 	if (whipe_b) { //if the canvas was whiped, redraw every cell
 	    whipe_b = false;
 	    for (i = r.i_0; i <= r.i_1; i++)
@@ -132,13 +126,13 @@ function Projector(canvas){
     }
     
     
-    this.resize = function(coordinate_handler) {
+    this.resize = function(coordinate_handler, new_gstate=gstate) {
 	cell_size = coordinate_handler.cell_size;
 	i_y = coordinate_handler.i_y;
 	j_x = coordinate_handler.j_x;
 	rectangle = coordinate_handler.rectangle;
 	this.whipe();
-	this.project(gstate);
+	this.project(new_gstate);
     }
 }
 	
