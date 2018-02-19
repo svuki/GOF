@@ -111,7 +111,7 @@ const rle = (function() {
 	const cols = rle_header_cols(header);
 	const rule = rle_header_rule(header);
 	const tdarr = tdarr_from_rle(lines.slice(1).join(''), cols, 0);
-	return {rule : rule, pattern : tdarr};
+	return {rule : rule, gamestate: new GameState(tdarr)};
     }
     
     
@@ -139,11 +139,11 @@ const rle = (function() {
     }
 
     return {
-	encode : function(tdarr, rule=classic_rule, compress_b=true) {
+	encode : function(gamestate, rule=classic_rule, compress_b=true) {
             if (compress_b)
-		return to_rle(reduce_to_pattern(tdarr), rule);
+		return to_rle(reduce_to_pattern(gamestate.cells), rule);
             else
-		return to_rle(tdarr, rule);
+		return to_rle(gamestate.cells, rule);
 	},    
 	decode : (r) => from_rle(r)
     }
