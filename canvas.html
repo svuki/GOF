@@ -17,17 +17,15 @@
       <h2> Controls </h2>
         <ul>
           <li> Click on a cell to toggle it on/off.</li>
-          <li> Drag across a region of cells to save the underlying pattern.</li>
-          <li> Shift click to copy the last saved pattern The pattern will then be oriented so that the upper left corner is at the click position.</li>
+	  <li> The RLE text area can read RLE formatted game of life patterns. You can find RLE pattern files <a href="http://conwaylife.com/wiki/Category:Patterns">here</a>. Clicking read RLE will load
+               the RLE into the smaller canvas.</li>
+          <li> Shift click to copy the pattern in the smaller canvas.</li>
           <li> The Go/Stop button will toggle iteration.</li>
-          <li> The slide controls the rate of iteration.</li>
-          <li> The reset button will clear the board of any live cells.</li>
-          <li> The grid button will overlay a grid over the board.</li>
-          <li> The save button will add the current state to the save-list. Clicking an element of the save-list will restore that state to the main canvas</li>
+          <li> The soup button fills the board with a random configuration. </li>
         </ul>
         </div>
         <div class="wrapper">
-            <canvas id="grid-canvas" width="900" height="500"></canvas>
+            
             <canvas id="gol-canvas" width="900" height="500"></canvas>
             <button id="toggle_step_btn" class="controls">Go/Stop</button>
             <button id="reset_btn"  class="controls">Reset</button>
@@ -44,7 +42,7 @@
             </div>
 	    <div class="rle_area">
 	      <textarea id="rle_textarea" rows="6" cols="70">Enter RLE here.</textarea>
-	      <button id="rle_submit_btn" onclick="stuff()">Read RLE</button>
+	      <button id="rle_submit_btn">Read RLE</button>
 	      <button id="rle_generate_btn">Generate RLE</button>
 	    </div>
 	    <div class="saved_pattern">
@@ -52,16 +50,17 @@
 	    </div>
 	</div>
 	
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="js/patterns.js"></script>
 	<script src="js/utils.js"></script>
         <script src="js/rate_controller.js"></script>
         <script src="js/TDArray.js"></script>
         <script src="js/gof.js"></script>
 	<script src="js/projection.js"></script>
         <script src="js/grid.js"></script>
-	<script src="js/main_canvas.js"></script>
+	<script src="js/canvas_set.js"></script>
+	<script src="js/rle.js"></script>
         <script src="js/state.js"></script>
 	<script src="js/control.js"></script>
-	<script src="js/patterns.js"></script>
     </body>
 </html>
