@@ -1,13 +1,16 @@
 //functions related to projected game states on canvasas
 
-const colors = {0 : 'white', 1: 'black'};
-
-function draw_cell(ctx, cell_size, val, i, j, i_offset, j_offset) {
-    const to_canv_x = (j) => j * cell_size + j_offset;
-    const to_canv_y = (i) => i * cell_size + i_offset; 
-    let color = colors[val];
-    ctx.fillStyle = color;
-    ctx.fillRect(to_canv_y(j), to_canv_x(i), cell_size, cell_size);
+function i_to_y(i_0, y_offset, cell_size) {
+    return (i) => (i - i_0) * cell_size + y_offset;
+}
+function j_to_x(j_0, x_offset, cell_size) {
+    return (j) => (j - j_0) * cell_size + x_offset;
+}
+function y_to_i(i_0, y_offset, cell_size) {
+    return (y) => Math.floor( (y - y_offset) / cell_size + i_0);
+}
+function x_to_j(j_0, x_offset, cell_size) {
+    return (x) => Math.floor( (x - x_offset) / cell_size + j_0);
 }
 
 function calculate_rectangle(canvas, gstate, cell_size) {
@@ -19,8 +22,8 @@ function calculate_rectangle(canvas, gstate, cell_size) {
     const total_rows = gstate.cells.rows;
     const total_cols = gstate.cells.cols;
 
-    const i_offset = ((canv_rows - Math.floor(canv_rows)) / 2) * cell_size;
-    const j_offset = ((canv_cols - Math.floor(canv_cols)) / 2) * cell_size;
+    const y_offset = ((canv_rows - Math.floor(canv_rows)) / 2) * cell_size;
+    const x_offset = ((canv_cols - Math.floor(canv_cols)) / 2) * cell_size;
 
     const row_offset = (total_rows - canv_rows) / 2;
     const col_offset = (total_cols - canv_cols) / 2;
@@ -35,17 +38,107 @@ function calculate_rectangle(canvas, gstate, cell_size) {
 	     j_0 : j_0,
 	     i_1 : i_1,
 	     j_1 : j_1,
-	     i_offset : i_offset,
-	     j_offset : j_offset
+	     y_offset : y_offset,
+	     x_offset : x_offset
 	   };
 }
 
-function project_game_state(canvas, gstate, cell_size) {
-    const ctx = canvas.getContext('2d');
-    const coords = calculate_rectangle(canvas, gstate, cell_size);
+function Coordinate_handler(canvas, gstate, csize) {
 
-    gstate.cells.rect(coords.i_0, coords.j_0, coords.i_1, coords.j_1).for_each(
-	(val, i, j, tdarr) =>
-	    draw_cell(ctx, cell_size, val, i, j, coords.i_offset, coords.j_offset) );
+    this.rectangle = undefined;
+    this.cell_size = undefined;
+    this.i_y = undefined;
+    this.j_x = undefined;
+    this.y_i = undefined;
+    this.x_j = undefined;
+
+    this.resize = function(new_size) {
+	this.cell_size = new_size;
+	this.rectangle = calculate_rectangle(canvas, gstate, this.cell_size);
+	let r = this.rectangle;
+	this.i_y = i_to_y(r.i_0, r.y_offset, this.cell_size);
+	this.j_x = j_to_x(r.j_0, r.x_offset, this.cell_size);
+	this.y_i = y_to_i(r.i_0, r.y_offset, this.cell_size);
+	this.x_j = x_to_j(r.j_0, r.x_offset, this.cell_size);
+    }
+
+    this.initialize = function() {
+	this.resize(csize);
+    }
 }
 
+//Drawing
+	
+const colors = {0 : 'white', 1: 'black'};
+function draw_cell_xy(ctx, cell_size, val, x, y) {
+    let color = colors[val];
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, cell_size, cell_size);
+}
+
+
+function auto_cell_size(canvas, gstate) {
+    const val = Math.max(gstate.cells.rows, gstate.cells.cols);
+    return Math.floor(canvas.width / val);
+}
+
+function auto_project_game_state(canvas, gstate) {
+    //selects cell size to show as much as possible
+    const cell_size = auto_cell_size(canvas, gstate);
+    project_game_state(canvas, gstate, cell_size);
+}
+
+function Projector(canvas){
+    //projects the given game state at the given zoom level onto
+    //the bound canvas
+    let ctx = canvas.getContext('2d');
+    let gstate = undefined;
+    let cell_size = undefined;
+    let rectangle = undefined;
+    let i_y = undefined;
+    let j_x = undefined;
+    let whipe_b = false;
+    
+    this.initialize = function(gamestate, coordinate_handler) {
+	gstate = gamestate.copy();
+	this.resize(coordinate_handler);
+    }
+
+    this.whipe = function() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	whipe_b = true;
+    }
+    
+    this.project = function(gamestate) {
+	
+	const r = rectangle;
+
+	console.log("PROJECT: x_offset: " + r.x_offset);
+	console.log("PROJECT: y_offset: " + r.y_offset);
+
+	if (whipe_b) { //if the canvas was whiped, redraw every cell
+	    whipe_b = false;
+	    for (i = r.i_0; i <= r.i_1; i++)
+		for(j = r.j_0; j <= r.j_1; j++)
+		    draw_cell_xy(ctx, cell_size, gamestate.cells.at(i,j), j_x(j), i_y(i));
+	}
+	else { //otherwise only draw those cell whose value has changed
+	    for (i = r.i_0; i <= r.i_1; i++)
+		for(j = r.j_0; j <= r.j_1; j++)
+		    if (gstate.cells.at(i, j) !== gamestate.cells.at(i,j))
+			draw_cell_xy(ctx, cell_size, gamestate.cells.at(i,j), j_x(j), i_y(i))
+	}
+	gstate = gamestate.copy();
+    }
+    
+    
+    this.resize = function(coordinate_handler) {
+	cell_size = coordinate_handler.cell_size;
+	i_y = coordinate_handler.i_y;
+	j_x = coordinate_handler.j_x;
+	rectangle = coordinate_handler.rectangle;
+	this.whipe();
+	this.project(gstate);
+    }
+}
+	

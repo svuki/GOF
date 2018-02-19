@@ -8,29 +8,39 @@ function GameState (cells_tdarr) {
 	this.cells = cells_tdarr;
 }
 
+function GameStateFromCanvas(canvas, cell_size=1) {
+    //Creates a new, empty gamestate with the maximum number of cells of size CELL_SIZE
+    //that fit onto canvas.
+    const rows = canvas.height / cell_size;
+    const cols = canvas.width / cell_size;
+
+    return newEmptyGameState(rows, cols);
+}
+
 function newEmptyGameState(rows, cols) {
-    return new GameState(new TDArray(rows, cols, () => 0, wrap_b = true));
+    return new GameState(new TDArray(rows, cols, () => 0, false));
 }
 
 GameState.prototype.toggle = function(i,j) {
     const val = this.cells.at(i,j) === 0 ? 1 : 0;
-    this.cells.set(i,j,val);
-    return val;
+    const new_cells = this.cells.copy();
+    new_cells.set(i,j,val);
+    return new GameState(new_cells);
 }
 GameState.prototype.clear = function () {
-    this.cells = this.cells.map( () => 0 );
+    return new GameState(this.cells.map( () => 0 ));
 }
 GameState.prototype.copy = function () {
-    return new GameState(this.cells.rows, this.cells.cols, this.cells.copy())
+    return new GameState(this.cells.copy())
 }
 GameState.prototype.soup = function () {
     //randomly fill the gameState with 1's and 0's
-    this.cells = this.cells.map( () => Math.random() > 0.5 ? 1 : 0);
+    return new GameState(this.cells.map( () => Math.random() > 0.5 ? 1 : 0));
 }
 GameState.prototype.merge = function(otherGameState, i=0, j=0) {
     //takes the cells of otherGameState and copies them in such that
     //cells[0][0] of otherGameState is at [i][j] in this game state
-    this.cells.merge(otherGameSate.cells, i, j);
+    this.cells.merge(otherGameState.cells, i, j);
 }
 GameState.prototype.map = function (f) {
     return new GameState(this.cells.map(f));
@@ -62,18 +72,4 @@ function apply_rule(rule, gstate) {
     return gstate.map(rule_fn(rule));
 }
     
-function Game_of_life(initial_state, rule=classic_rule) {
-    this.current_state = initial_state;
-    this.rule = rule;
-    this.toggle = (i,j) => this.current_state.toggle(i,j);
-    this.step = function() {
-	this.current_state = apply_rule(rule, this.current_state);
-    }
-    this.snapshot = function() {
-	return {state : this.current_state,
-		rule  : this.rule};
-    }
-}
 
-
-    
