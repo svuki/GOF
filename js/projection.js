@@ -80,12 +80,6 @@ function auto_cell_size(canvas, gstate) {
     return Math.floor(canvas.width / val);
 }
 
-function auto_project_game_state(canvas, gstate) {
-    //selects cell size to show as much as possible
-    const cell_size = auto_cell_size(canvas, gstate);
-    project_game_state(canvas, gstate, cell_size);
-}
-
 function Projector(canvas){
     //projects the given game state at the given zoom level onto
     //the bound canvas
