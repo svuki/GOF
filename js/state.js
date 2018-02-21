@@ -1,85 +1,20 @@
-const state = {
-    rate : 1000,
-    step_on: false,
-    grid_on: false,
-    cell_size : 10,
-    //if you change this, look to change the initialization of the pattern canvas as well
-    //currently the pattern canvas is initialized witha cell_size of 10 which might be too small
-    pattern : newEmptyGameState(30, 30), 
-    gamestate : undefined,
-    rule : undefined,
-    save_list : [],
-    
-    observers : {
-	rate : [],
-	step_on : [],
-	grid_on : [],
-	cell_size : [],
-	pattern : [],
-	gamestate : [],
-	rule : [],
-	save_list : []
-    },
-    
-    add_observer : function(property, obj) {
-	//Property is a string corresponding to one of the elements of state.observers,
-	//obj is the object subscribing to updates
-	if (! this.observers.hasOwnProperty(property))
-	    console.log("Error, attempted to add observer to state for nonexistent property: " + property);
-	else
-	    this.observers[property].push(obj);
-    },
-    notify : function(property) {
-	//Property is a string corresponding to one of the elements of state.observers
-	if (! property in this.observers)
-	    console.log("Error, state attempted to notify on nonexistent property: " + property);
-	else
-	    this.observers[property].forEach( (it) => it.update(property) );
-    }
-	
-}
+const state = makeObservable();
+state.rate = 1000;
+state.step_on = false;
+state.grid_on = false;
+state.cell_size = 10;
+state.pattern = newEmptyGameState(30, 30);
+state.gamestate = undefined;
+state.rule = classic_rule; //By default the rule is B3/S23
+state.save_list = [];
 
-
-function set_rate(new_rate) {
-    state.rate = new_rate;
-    state.notify( "rate" );
-}
 
 function toggle_step() {
     state.step_on = state.step_on ? false : true;
-    state.notify("step_on");
 }
 
 function toggle_grid() {
     state.grid_on = state.grid_on ? false : true;
-    state.notify("grid_on");
-}
-
-function set_cell_size(new_size) {
-    state.cell_size = new_size;
-    state.notify("cell_size");
-}
-
-function set_gamestate(new_state) {
-    state.gamestate = new_state;
-    state.notify("gamestate");
-}
-
-function get_gamestate() {
-    return state.gamestate;
-}
-
-function set_rule(new_rule) {
-    state.rule = new_rule;
-    state.notify("rule");
-}
-
-function set_pattern(new_gamestate) {
-    state.pattern = new_gamestate;
-    state.notify("pattern");
-}
-function get_pattern() {
-    return state.pattern;
 }
 
 function snapshot() {
@@ -88,34 +23,29 @@ function snapshot() {
 	rule : state.rule,
     };
 }
+
+function load_snapshot(snapshot) {
+    state.gamestate = snapshot.gamestate;
+    state.rule = snapshot.rule;
+}
+
 function add_to_save_list(x) {
     state.save_list.push(x);
     state.notify("save_list");
 }
 
-function load_snapshot(snapshot) {
-    set_gamestate(snapshot.gamestate);
-    set_rule(snapshot.rule);
-}
-    
-///
-const gol_canvas_id = "#gol-canvas";
-///Get Canvases
+//---------------------------------------------------------------
+//----- Initializing the main canvas and the initial gamestate
+//---------------------------------------------------------------
 const gol_canvas = $(gol_canvas_id).get(0);
-
-//Set initial game state: the maximum zoom size is 5
 state.gamestate = GameStateFromCanvas(gol_canvas, 5);
 
-//By default, the rule is B3/S23
-state.rule = classic_rule;
-
 //Create and Initialize main canvas set
-const main_c_set = new Canvas_set("#gol-canvas", 10);
-main_c_set.initialize(state.gamestate, 10, get_gamestate, set_gamestate);
-
-state.add_observer('gamestate', main_c_set);
-state.add_observer('grid_on', main_c_set);
-state.add_observer('cell_size', main_c_set);
+const main_c_set = new Canvas_set(gol_canvas_id, 10);
+main_c_set.initialize(state.gamestate,
+		      10,
+		      () => state.gamestate,
+		      (g) => state.gamestate = g);
 
 //Default behavior for clicks is to toggle the underlying cell.
 //We override it here so that shift-clicking will copy in the currently saved pattern
@@ -127,6 +57,9 @@ $(main_c_set.over_canvas).click( function(e) {
 	main_c_set.toggle(e.offsetX, e.offsetY);
 });
 
+state.addObserver('gamestate', main_c_set);
+state.addObserver('grid_on', main_c_set);
+state.addObserver('cell_size', main_c_set);
 	
 main_c_set.update = function(property) {
     switch(property) {
@@ -145,13 +78,15 @@ main_c_set.update = function(property) {
 }
 
 
-
-
-///Create the stepper which controls the rate the game of life evolves at
-const stepper = new RateController(state.rate, () =>
-				   set_gamestate(apply_rule(state.rule, state.gamestate)));
-state.add_observer('rate', stepper);
-state.add_observer('step_on', stepper);
+//-----------------------------------------------------------------------
+//------------- Rate of Game Evolution Control --------------------------
+//-----------------------------------------------------------------------
+const stepper = new RateController(state.rate, function() {
+    state.gamestate = apply_rule(state.rule, state.gamestate);
+});
+				  
+state.addObserver('rate', stepper);
+state.addObserver('step_on', stepper);
 stepper.update = function(property) {
     switch (property) {
     case 'rate':
@@ -163,19 +98,23 @@ stepper.update = function(property) {
     }
 }
 
-///Create canvas set for the pattern canvas
-const pattern_canvas_id = "#pattern_canvas";
-const pattern_c_set = new Canvas_set(pattern_canvas_id, 10); //hardcoded 10
-pattern_c_set.initialize(state.pattern, 10, get_pattern, set_pattern);
+//----------------------------------------------------------------------
+//----------------- Setting up the small canvas-------------------------
+//----------------------------------------------------------------------
+const pattern_c_set = new Canvas_set(pattern_canvas_id, 10); 
+pattern_c_set.initialize(state.pattern, 10,
+			 () => state.pattern,
+			 (g) => state.pattern = g);
+
 pattern_c_set.toggle_grid();
 
-state.add_observer('pattern', pattern_c_set);
+state.addObserver('pattern', pattern_c_set);
 
 pattern_c_set.update = function(property) {
     switch (property) {
     case 'pattern':
 	const csize = auto_cell_size(pattern_c_set.under_canvas, state.pattern);
-	this.change_gamestate(get_pattern(), csize);
+	this.change_gamestate(state.pattern, csize);
 	this.grid.resize(csize);
 	break;
     }
@@ -183,11 +122,18 @@ pattern_c_set.update = function(property) {
 
 
 
-//For the time being, initialize the pattern canvas and the RLE text area w/ a backrake
-$("#rle_textarea").val(patterns.backrake_1);
-set_pattern(rle.decode(patterns.backrake_1).gamestate);
+//-------------------------------------------------------------------
+//------------------ RLE text area ----------------------------------
+//-------------------------------------------------------------------
 
-//Update the save_list by displaying the relevant snapshot
+
+$(rle_textarea_id).val(patterns.backrake_1);
+state.pattern = rle.decode(patterns.backrake_1).gamestate;
+
+//------------------------------------------------------------------
+//-------------------- Save List -----------------------------------
+//------------------------------------------------------------------
+
 const save_list = {
     update : function (property) {
 	switch (property) {
@@ -197,4 +143,4 @@ const save_list = {
 	}
     }
 }
-state.add_observer("save_list", save_list);
+state.addObserver("save_list", save_list);
