@@ -56,3 +56,24 @@
     top: 550px;
     left: 600px;
 }
+
+#save-list {
+    position: relative;
+    padding: 0px;
+    left: 0px;
+    list-style-type: none;
+    width: 300px;
+}
+
+.save_list_upper {
+    border: solid;
+    border-width: thin;
+    background-color: lightgrey;
+    position: relative;
+    z-idnex: 0;
+}
+
+.save_list_btn {
+    position: relative;
+    z-index: 1;
+}
