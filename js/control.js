@@ -16,4 +16,12 @@ $("#rle_submit_btn").click( function() {
     const result = rle.decode(rle_text);
     set_pattern(result.gamestate);
 });
+$("#rle_generate_btn").click( function() {
+    const rle_str = rle.encode(state.gamestate, state.rule);
+    rle_textarea.val(rle_str);
+});
+
+$("#save_btn").click( function() {
+    add_to_save_list(snapshot());
+});
     
