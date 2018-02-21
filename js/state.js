@@ -8,6 +8,7 @@ const state = {
     pattern : newEmptyGameState(30, 30), 
     gamestate : undefined,
     rule : undefined,
+    save_list : [],
     
     observers : {
 	rate : [],
@@ -16,7 +17,8 @@ const state = {
 	cell_size : [],
 	pattern : [],
 	gamestate : [],
-	rule : []
+	rule : [],
+	save_list : []
     },
     
     add_observer : function(property, obj) {
@@ -80,6 +82,22 @@ function get_pattern() {
     return state.pattern;
 }
 
+function snapshot() {
+    return {
+	gamestate : state.gamestate,
+	rule : state.rule,
+    };
+}
+function add_to_save_list(x) {
+    state.save_list.push(x);
+    state.notify("save_list");
+}
+
+function load_snapshot(snapshot) {
+    set_gamestate(snapshot.gamestate);
+    set_rule(snapshot.rule);
+}
+    
 ///
 const gol_canvas_id = "#gol-canvas";
 ///Get Canvases
@@ -168,3 +186,15 @@ pattern_c_set.update = function(property) {
 //For the time being, initialize the pattern canvas and the RLE text area w/ a backrake
 $("#rle_textarea").val(patterns.backrake_1);
 set_pattern(rle.decode(patterns.backrake_1).gamestate);
+
+//Update the save_list by displaying the relevant snapshot
+const save_list = {
+    update : function (property) {
+	switch (property) {
+	case 'save_list':
+	    addToSaveList(state.save_list[state.save_list.length - 1]);
+	    break;
+	}
+    }
+}
+state.add_observer("save_list", save_list);
