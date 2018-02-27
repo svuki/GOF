@@ -1,10 +1,15 @@
+// This file contains a constructor for game of life canvases. These structures
+// consist of two overlaid canvases. The bottom canvas handles the display of
+// gamestates while the top canvas handles the display of grids and click detection.
+
+
 function Canvas_set(canvas_id, cell_size=10) {
     this.under_canvas = $(canvas_id).get(0);
 
     if (this.under_canvas === undefined)
 	throw ("Error: Canvas_set passed invalid canvas-id: " + canvas_id);
 
-    //create and initialize the over canvas 
+    //create and initialize the top canvas directly on top of the exiting canvas
     let o_canvas = document.createElement('canvas');
     o_canvas.height = this.under_canvas.height;
     o_canvas.width = this.under_canvas.width;
@@ -17,8 +22,14 @@ function Canvas_set(canvas_id, cell_size=10) {
    
     this.set_gamestate = undefined;
     this.get_gamestate = undefined;
-    this.projector = new Projector(this.under_canvas);
+    
+    //a projector is used to handle displaying of gamestates 
+    this.projector = new Projector(this.under_canvas); //initialized in initialize()
     this.grid = new Grid(this.over_canvas, cell_size);
+
+    // a coordiante handler is used to manage mappings beetween (x,y) position clicks on
+    // the over canvas and (i, j) logical indicies in the gamestate. This mapping changes with
+    // every change in displayed cell size.
     this.coordinate_handler = undefined; //set in initialize()
     
     this.initialize = function(gamestate, cell_size, getter, setter) {
@@ -31,7 +42,8 @@ function Canvas_set(canvas_id, cell_size=10) {
     }
 
     this.change_gamestate = function(gamestate, cell_size){
-	// used when one wants to display a gamestate of different dimensions than the previous one
+	// change_gamestate is used when one wants to project a new gamestate of
+	// different dimensions than the last gamestate
 	this.coordinate_handler = new Coordinate_handler(this.under_canvas,
 							 gamestate, cell_size);
 	this.projector.resize(this.coordinate_handler, gamestate);
@@ -41,7 +53,6 @@ function Canvas_set(canvas_id, cell_size=10) {
 	let i = this.coordinate_handler.y_i(y);
 	let j = this.coordinate_handler.x_j(x);
 	let a = this.get_gamestate().toggle(i,j);
-	console.log(a);
 	this.set_gamestate(a);
     }
 
@@ -49,6 +60,8 @@ function Canvas_set(canvas_id, cell_size=10) {
     $(this.over_canvas).click( (e) => this.toggle(e.offsetX, e.offsetY));
 
     this.merge = function(otherGameState, x, y) {
+	// copies in the data in otherGameState into the current gamestate
+	// at the logical index (i,j) corresponding to the canvas coordinates (x,y)
 	let i = this.coordinate_handler.y_i(y);
 	let j = this.coordinate_handler.x_j(x);
 
@@ -56,9 +69,11 @@ function Canvas_set(canvas_id, cell_size=10) {
     }
 
     this.project = function() {
+	// displays the current game_state onto the under_canvas
 	this.projector.project(this.get_gamestate());
     }
     this.toggle_grid = function() {
+	// show/hide the grid
 	this.grid.toggle();
     }
 }
