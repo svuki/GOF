@@ -1,61 +1,24 @@
+// This file exports the rle object which has two functions:
+//      rle.decode
+//      rle.encode
+
+// Run length encoded (RLE) form for a game of life pattern consists of
+//   (1) a header with the number of rows, columns,
+//       and the game rule (ex: x=23, y=24, rule=B2/S34),
+//   (2) a run length encoded string where live cells are represented by an 'o',
+//       dead cells by a 'b', row endings by '$', and the pattern end by '!'
+//       (for example: '3bo$3b5o2$o!'). Unspecified ends in a given row are
+//       assumed to be dead (for example, if x=5 in the header, the row '2bo$'
+//       expands to 'bbobb')
+//   and (3) any number of comment lines begining with '#'
+
+// Decoding a RLE pattern will produce a gamestate of the dimensions specified in
+// in the RLE pattern header.
+
 const rle = (function() {
-    function reduce_to_pattern(tdarr) {
-	//returns only that portion of tdarr relevant to the contained pattern
-	//TODO: when working with wrapped TDArrays, this will chop off possbily 
-	//important empty rows right where the TDArray wraps around
-	const is_one = (v) => v === 1;
-	let i_0 = -1; //row of first non-zero entry with least i_index
-	let j_0 = -1; //col of none-zero entry with least j_index
-	let i_1 = -1; //row of last non-zero entry
-	let j_1 = -1; //col of entry with greatest j_index
-	for (r_index = 0; r_index < tdarr.rows; r_index++) {
-            if (tdarr.row(r_index).some(is_one)) {
-		i_0 = r_index;
-		break;
-            }
-	}
-	for (r_index = tdarr.rows - 1; r_index >= 0; r_index--) {
-            if (tdarr.row(r_index).some(is_one)) {
-		i_1 = r_index;
-		break;
-            }
-	}
-	for (c_index = 0; c_index < tdarr.cols; c_index++) {
-            if (tdarr.col(c_index).some(is_one)) {
-            j_0 = c_index;
-		break;
-            }
-	}
-	for (c_index = tdarr.cols - 1; c_index >= 0; c_index--) {
-            if (tdarr.col(c_index).some(is_one)) {
-		j_1 = c_index;
-		break;
-        }
-	}
-	return tdarr.rect(i_0, j_0, i_1, j_1);
-    }
-    
-    function from_rle_group(s) {
-	//produces an array of values from a RLE codon
-	//for example "3o" => [1, 1, 1,]
-	//for example "b" => [0]
-	const enc_map = {'o' : 1, 'b' : 0};
-	let matches = s.match(/(\d*)([a-z])/);
-	let val = enc_map[matches[2]];
-	let num_str = matches[1];
-    
-	if (num_str  === '') {
-	    return [val];
-	}
-	else {
-	    let num = parseInt(num_str);
-	    return new Array(num).fill(val);
-	}
-    }
-	
     
     function rle_to_row(rle) {
-	//given a rle encoding a row, returns the row decoded
+	//Given the rle data for a single row, produces the expanded row as an array 
 	if (rle === '' || rle === '!')
 	    return [];
 	const regex = new RegExp(/(\d*[a-z])/, 'g');
@@ -71,7 +34,7 @@ const rle = (function() {
     }
     
     function tdarr_from_rle(rle, row_len, pad_value=0) {
-    //given a rle encoding a pattern and the row length of the pattern
+	//given a rle encoding a pattern and the row length of the pattern
 	//returns a TDArray holding the pattern.
 	
 	//handle empty lines
@@ -125,6 +88,61 @@ const rle = (function() {
 	return ret;
     }
 
+    function from_rle_group(s) {
+	//produces an array of values from a RLE codon
+	//for example "3o" => [1, 1, 1,]
+	//for example "b" => [0]
+	const enc_map = {'o' : 1, 'b' : 0};
+	let matches = s.match(/(\d*)([a-z])/);
+	let val = enc_map[matches[2]];
+	let num_str = matches[1];
+    
+	if (num_str  === '') {
+	    return [val];
+	}
+	else {
+	    let num = parseInt(num_str);
+	    return new Array(num).fill(val);
+	}
+    }
+
+     function reduce_to_pattern(tdarr) {
+	//Given a TDArray, returns another TDArray with the same pattern of live cells
+	//without any unecessary rows or columns of dead cells
+	
+	const is_one = (v) => v === 1;
+	let i_0 = -1; //row of first non-zero entry with least i_index
+	let j_0 = -1; //col of none-zero entry with least j_index
+	let i_1 = -1; //row of last non-zero entry
+	let j_1 = -1; //col of entry with greatest j_index
+	
+	for (r_index = 0; r_index < tdarr.rows; r_index++) {
+            if (tdarr.row(r_index).some(is_one)) {
+		i_0 = r_index;
+		break;
+            }
+	}
+	for (r_index = tdarr.rows - 1; r_index >= 0; r_index--) {
+            if (tdarr.row(r_index).some(is_one)) {
+		i_1 = r_index;
+		break;
+            }
+	}
+	for (c_index = 0; c_index < tdarr.cols; c_index++) {
+            if (tdarr.col(c_index).some(is_one)) {
+            j_0 = c_index;
+		break;
+            }
+	}
+	for (c_index = tdarr.cols - 1; c_index >= 0; c_index--) {
+            if (tdarr.col(c_index).some(is_one)) {
+		j_1 = c_index;
+		break;
+            }
+	}
+	return tdarr.rect(i_0, j_0, i_1, j_1);
+    }
+    
     function to_rle(tdarr, rule) {
 	const header = ['x=', tdarr.cols, ', y=', tdarr.rows, ", rule = ", rule.string].join('');
 	let pattern_rle =  tdarr.row_map( row_to_rle ).join('');
@@ -140,12 +158,15 @@ const rle = (function() {
 
     return {
 	encode : function(gamestate, rule=classic_rule, compress_b=true) {
+	    // Encodes the given gamestate as a RLE pattern. COMPRESS_B determines whether
+	    // the gamestate will be recorded in full (including unecessary rows/columns of cells)
+	    // or if the gamestate will be reduced to only those cells relevant to the contained pattern
             if (compress_b)
 		return to_rle(reduce_to_pattern(gamestate.cells), rule);
             else
 		return to_rle(gamestate.cells, rule);
 	},    
 	decode : (r) => from_rle(r)
-    }
+    };
 }());
    
