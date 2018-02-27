@@ -1,4 +1,4 @@
-//functions related to projected game states on canvasas
+// This file defines the constructors Coordinate_handler and Projector.
 
 function i_to_y(i_0, y_offset, cell_size) {
     return (i) => (i - i_0) * cell_size + y_offset;
@@ -44,9 +44,16 @@ function calculate_rectangle(canvas, gstate, cell_size) {
 }
 
 function Coordinate_handler(canvas, gstate, csize) {
-
+    // A Coordinate_handler is used to provide mappings between canvas coordinates (x,y) and
+    // logical gamestate coordinates (i, j). This mapping is determined by the current cell size
+    // (zoom level). To request new mappings, call this.resize(new_cell_size).
+    
     this.rectangle = undefined;
     this.cell_size = undefined;
+
+    // The following four functions are the mappings of (x,y) to (i,j) coordinates.
+    // i_y takes i coordinates and returns y coordiantes, y_i takes y coordinates and returns i coordinates,
+    // and the same holds for x_j and j_x.
     this.i_y = undefined;
     this.j_x = undefined;
     this.y_i = undefined;
@@ -65,9 +72,10 @@ function Coordinate_handler(canvas, gstate, csize) {
     this.resize(csize);
 }
 
-//Drawing
+// Drawing
 	
 const colors = {0 : 'white', 1: 'black'};
+
 function draw_cell_xy(ctx, cell_size, val, x, y) {
     let color = colors[val];
     ctx.fillStyle = color;
@@ -81,8 +89,8 @@ function auto_cell_size(canvas, gstate) {
 }
 
 function Projector(canvas){
-    //projects the given game state at the given zoom level onto
-    //the bound canvas
+    // Draws gamestates onto canvases with specified cell_size.
+    
     let ctx = canvas.getContext('2d');
     let gstate = undefined;
     let cell_size = undefined;
@@ -97,20 +105,25 @@ function Projector(canvas){
     }
 
     this.whipe = function() {
+	// Clear the canvas.
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	whipe_b = true;
     }
     
     this.project = function(gamestate) {
-	
+	// Draws the passed gamestate onto the canvas 
 	const r = rectangle;
-	if (whipe_b) { //if the canvas was whiped, redraw every cell
+	
+	//if the canvas was whiped, redraw every cell
+	if (whipe_b) { 
 	    whipe_b = false;
 	    for (i = r.i_0; i <= r.i_1; i++)
 		for(j = r.j_0; j <= r.j_1; j++)
 		    draw_cell_xy(ctx, cell_size, gamestate.cells.at(i,j), j_x(j), i_y(i));
 	}
-	else { //otherwise only draw those cell whose value has changed
+
+	//otherwise only draw those cell whose value has changed
+	else { 
 	    for (i = r.i_0; i <= r.i_1; i++)
 		for(j = r.j_0; j <= r.j_1; j++)
 		    if (gstate.cells.at(i, j) !== gamestate.cells.at(i,j))
