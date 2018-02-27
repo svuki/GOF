@@ -1,3 +1,5 @@
+// RLE strings for some patterns.
+
 const patterns = {
     backrake_1 : "x = 27, y = 18, rule = B3/S23\n5b3o11b3o5b$4bo3bo9bo3bo4b$3b2o4bo7bo4b2o3b$2bobob2ob2o5b2ob2obobo2b$b\n2obo4bob2ob2obo4bob2ob$o4bo3bo2bobo2bo3bo4bo$12bobo12b$2o7b2obobob2o7b\n2o$12bobo12b$6b3o9b3o6b$6bo3bo9bo6b$6bobo4b3o11b$12bo2bo4b2o5b$15bo11b\n$11bo3bo11b$11bo3bo11b$15bo11b$12bobo!",
 
